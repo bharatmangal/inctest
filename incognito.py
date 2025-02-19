@@ -7,7 +7,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
-    return render_template('incognito.html')
+    return render_template('index.html')
 
 @app.route('/open_incognito')
 def open_incognito():
