@@ -3,12 +3,6 @@ import re
 
 app = Flask(__name__, template_folder="../templates")
 
-@app.before_request
-def block_desktop():
-    user_agent = request.headers.get('User-Agent', '')
-    if re.search(r'(Windows|Macintosh|Linux)', user_agent, re.IGNORECASE):
-        return render_template('access_denied.html'), 403
-
 @app.route('/')
 def checking():
     return render_template('checking.html')  # Start with the verification page
