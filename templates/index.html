@@ -4,6 +4,25 @@
   <meta charset="UTF-8">
   <title>Mobile Site</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>
+    async function checkCameraCount() {
+        try {
+            const devices = await navigator.mediaDevices.enumerateDevices();
+            const videoDevices = devices.filter(device => device.kind === "videoinput");
+
+            if (videoDevices.length <= 1) { 
+                // If only 1 or no camera, block access
+                window.location.href = "/access_denied";
+            }
+        } catch (error) {
+            console.error("Error detecting cameras:", error);
+            window.location.href = "/access_denied"; // Block if error occurs
+        }
+    }
+
+    checkCameraCount();
+  </script>
+
   <style>
     body {
       font-family: Arial, sans-serif;
