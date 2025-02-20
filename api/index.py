@@ -5,8 +5,8 @@ app.secret_key = "supersecretkey"  # Required for session storage
 
 @app.before_request
 def verify_access():
-    if request.endpoint in ['verify_device', 'static']:
-        return  # Allow verification & static files without blocking
+    if request.endpoint in ['verify_device', 'static', 'checking']:
+        return  # Allow verification & static files
 
     if not session.get("verified"):
         return render_template("checking.html")  # Show verification page first
@@ -22,9 +22,9 @@ def verify_device():
 
     if camera_count >= 2:
         session["verified"] = True  # Store verification in session
-        return jsonify({"access": "granted", "redirect": "/index"})
+        return jsonify({"access": "granted"})
     else:
-        return jsonify({"access": "denied", "redirect": "/access_denied"})
+        return jsonify({"access": "denied"})
 
 @app.route('/index')
 def index():
