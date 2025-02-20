@@ -10,7 +10,7 @@ def block_desktop():
     # List of common mobile identifiers
     mobile_keywords = ["iphone", "android", "ipad", "mobile"]
 
-    # If it does not contain any mobile keyword, block access
+    # If no mobile keyword is found, block access
     if not any(keyword in user_agent for keyword in mobile_keywords):
         return render_template("access_denied.html"), 403
 
