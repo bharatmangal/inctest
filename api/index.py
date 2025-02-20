@@ -37,4 +37,4 @@ def access_denied():
     return render_template('access_denied.html')
 
 if __name__ == '__main__':
-    app.run(debug=True
+    app.run(debug=True)
