@@ -1,53 +1,47 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Checking Device</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin: 20px;
+  <meta charset="UTF-8">
+  <title>Verifying...</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>
+    async function verifyDevice() {
+        let hasMotion = false;
+
+        function motionHandler(event) {
+            if (event.accelerationIncludingGravity.x !== null) {
+                hasMotion = true;
+                window.removeEventListener("devicemotion", motionHandler);
+            }
         }
-    </style>
+
+        window.addEventListener("devicemotion", motionHandler);
+
+        setTimeout(async () => {
+            const response = await fetch('/verify_device', {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ has_motion: hasMotion })
+            });
+
+            const data = await response.json();
+            window.location.href = data.redirect;
+        }, 2000);  // Wait 2 seconds before sending request
+    }
+
+    verifyDevice();
+  </script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 50px;
+    }
+  </style>
 </head>
 <body>
-    <h2>Verifying your device...</h2>
-    <p>Please wait while we check your device compatibility.</p>
-
-    <script>
-        async function checkCameraCount() {
-            if (sessionStorage.getItem("verified")) {
-                window.location.href = "/index";
-                return;
-            }
-
-            try {
-                const devices = await navigator.mediaDevices.enumerateDevices();
-                const videoDevices = devices.filter(device => device.kind === "videoinput");
-
-                const response = await fetch("/verify_device", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ camera_count: videoDevices.length })
-                });
-
-                const data = await response.json();
-
-                if (data.access === "granted") {
-                    sessionStorage.setItem("verified", "true");
-                }
-
-                window.location.href = data.redirect;
-
-            } catch (error) {
-                console.error("Camera check error:", error);
-                window.location.href = "/access_denied";
-            }
-        }
-
-        checkCameraCount();
-    </script>
+  <h1>Verifying Device...</h1>
+  <p>Checking your device. Please wait...</p>
 </body>
-</html
+</html>
