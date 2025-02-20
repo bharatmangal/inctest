@@ -6,12 +6,16 @@ app = Flask(__name__, template_folder="../templates")
 def index():
     return render_template("index.html")
 
+@app.route("/access_denied")
+def access_denied():
+    return render_template("access_denied.html")
+
 @app.route("/verify_device", methods=["POST"])
 def verify_device():
     data = request.json
-    is_mobile = data.get("is_mobile", False)
+    has_motion = data.get("has_motion", False)
 
-    if not is_mobile:
+    if not has_motion:
         return jsonify({"access": "denied"}), 403
     return jsonify({"access": "granted"})
 
