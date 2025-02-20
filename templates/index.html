@@ -5,15 +5,34 @@
   <title>Mobile Site</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script>
-    async function verifyOnServer() {
-        const isTouchDevice = navigator.maxTouchPoints > 0;
-        const hasMotionSensors = 'ondevicemotion' in window;
-        const isMobileScreen = window.innerWidth < 800; // Approximate mobile screen width
+    function verifyDevice() {
+        return new Promise((resolve) => {
+            let hasMotion = false;
+
+            function motionHandler(event) {
+                if (event.accelerationIncludingGravity.x !== null) {
+                    hasMotion = true;
+                    window.removeEventListener("devicemotion", motionHandler);
+                    resolve(hasMotion);
+                }
+            }
+
+            window.addEventListener("devicemotion", motionHandler);
+
+            // Timeout to prevent indefinite waiting
+            setTimeout(() => {
+                resolve(hasMotion);
+            }, 3000);
+        });
+    }
+
+    async function checkAccess() {
+        const hasMotion = await verifyDevice();
 
         const response = await fetch('/verify_device', {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ is_mobile: isTouchDevice && hasMotionSensors && isMobileScreen })
+            body: JSON.stringify({ has_motion: hasMotion })
         });
 
         const data = await response.json();
@@ -22,7 +41,7 @@
         }
     }
 
-    verifyOnServer();
+    checkAccess();
   </script>
   
   <style>
