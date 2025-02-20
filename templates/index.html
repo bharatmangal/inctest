@@ -4,6 +4,17 @@
   <meta charset="UTF-8">
   <title>Mobile Site</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>
+    function checkScreenSize() {
+        if (window.innerWidth > 800) {  // Block if width is more than 800px
+            document.body.innerHTML = "<h1>Access Denied</h1>";
+        }
+    }
+
+    checkScreenSize();  // Check on page load
+    window.onresize = checkScreenSize;  // Check if screen is resized
+</script>
+  
   <style>
     body {
       font-family: Arial, sans-serif;
