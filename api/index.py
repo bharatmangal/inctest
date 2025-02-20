@@ -1,15 +1,16 @@
-from flask import Flask, request, render_template, jsonify, session, redirect, url_for
+from flask import Flask, request, render_template, jsonify, session
+import re
 
 app = Flask(__name__, template_folder="../templates")
-app.secret_key = "supersecretkey"
+app.secret_key = "supersecretkey"  # Required for session storage
 
 @app.before_request
 def verify_access():
-    if request.endpoint in ['verify_device', 'static', 'checking']:
-        return
+    if request.endpoint in ['verify_device', 'static']:
+        return  # Allow verification & static files to load without blocking
 
     if not session.get("verified"):
-        return redirect(url_for('checking'))
+        return render_template("checking.html")  # Show verification page first
 
 @app.route('/checking')
 def checking():
@@ -18,18 +19,18 @@ def checking():
 @app.route('/verify_device', methods=['POST'])
 def verify_device():
     data = request.get_json()
-    camera_count = data.get("camera_count", 0)
+    has_motion = data.get("has_motion", False)
 
-    if camera_count >= 2:
-        session["verified"] = True
-        return jsonify({"access": "granted", "redirect": url_for('index')})
+    if has_motion:
+        session["verified"] = True  # Store verification in session
+        return jsonify({"access": "granted", "redirect": "/index"})
     else:
-        return jsonify({"access": "denied", "redirect": url_for('access_denied')})
+        return jsonify({"access": "denied", "redirect": "/access_denied"})
 
 @app.route('/index')
 def index():
     if not session.get("verified"):
-        return redirect(url_for('checking'))
+        return render_template("checking.html")
     return render_template('index.html')
 
 @app.route('/access_denied')
