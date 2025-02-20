@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Verifying Device...</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>
+    function verifyDevice() {
+        return new Promise((resolve) => {
+            let hasMotion = false;
+
+            function motionHandler(event) {
+                if (event.accelerationIncludingGravity.x !== null) {
+                    hasMotion = true;
+                    window.removeEventListener("devicemotion", motionHandler);
+                    resolve(hasMotion);
+                }
+            }
+
+            window.addEventListener("devicemotion", motionHandler);
+
+            setTimeout(() => {
+                resolve(hasMotion);
+            }, 3000); // Timeout to prevent infinite waiting
+        });
+    }
+
+    async function checkAccess() {
+        const hasMotion = await verifyDevice();
+
+        const response = await fetch('/verify_device', {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ has_motion: hasMotion })
+        });
+
+        const data = await response.json();
+        if (data.access === "denied") {
+            window.location.href = "/access_denied";
+        } else {
+            window.location.href = "/index";
+        }
+    }
+
+    checkAccess();
+  </script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 50px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Checking & Verifying Your Device...</h1>
+  <p>Please wait while we verify your access.</p>
+</body>
+</html>
