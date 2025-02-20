@@ -1,22 +1,19 @@
-from flask import Flask, request, render_template
-import re
+from flask import Flask, request, render_template, jsonify
 
-app = Flask(__name__, template_folder="../templates")
-
-@app.before_request
-def block_desktop():
-    user_agent = request.headers.get("User-Agent", "").lower()
-
-    # List of common mobile identifiers
-    mobile_keywords = ["iphone", "android", "ipad", "mobile"]
-
-    # If no mobile keyword is found, block access
-    if not any(keyword in user_agent for keyword in mobile_keywords):
-        return render_template("access_denied.html"), 403
+app = Flask(__name__, template_folder="templates")
 
 @app.route("/")
 def index():
     return render_template("index.html")
 
+@app.route("/verify_device", methods=["POST"])
+def verify_device():
+    data = request.json
+    is_mobile = data.get("is_mobile", False)
+
+    if not is_mobile:
+        return jsonify({"access": "denied"}), 403
+    return jsonify({"access": "granted"})
+
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run(debug=True)
