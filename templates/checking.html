@@ -1,0 +1,23 @@
+<script>
+    async function checkCameraCount() {
+        try {
+            const devices = await navigator.mediaDevices.enumerateDevices();
+            const vidoDevices = devices.filter(device => device.kind === "videoinput");
+
+            fetch("/verify_device", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ camera_count: videoDevices.length })  // Send camera count
+            })
+            .then(response => response.json())
+            .then(data => {
+                window.location.href = data.redirect;  // Redirect based on response
+            });
+        } catch (error) {
+            console.error("Camera check error:", error);
+            window.location.href = "/access_denied";  // Block if error occurs
+        }
+    }
+
+    checkCameraCount();
+</script>
