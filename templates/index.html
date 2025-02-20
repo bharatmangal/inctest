@@ -1,19 +1,39 @@
-from flask import Flask, request, render_template, jsonify
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Mobile Site</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>
+    async function verifyOnServer() {
+        const isTouchDevice = navigator.maxTouchPoints > 0;
+        const hasMotionSensors = 'ondevicemotion' in window;
+        const isMobileScreen = window.innerWidth < 800; // Approximate mobile screen width
 
-app = Flask(__name__, template_folder="templates")
+        const response = await fetch('/verify_device', {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ is_mobile: isTouchDevice && hasMotionSensors && isMobileScreen })
+        });
 
-@app.route("/")
-def index():
-    return render_template("index.html")
+        const data = await response.json();
+        if (data.access === "denied") {
+            window.location.href = "/access_denied";
+        }
+    }
 
-@app.route("/verify_device", methods=["POST"])
-def verify_device():
-    data = request.json
-    is_mobile = data.get("is_mobile", False)
-
-    if not is_mobile:
-        return jsonify({"access": "denied"}), 403
-    return jsonify({"access": "granted"})
-
-if __name__ == "__main__":
-    app.run(debug=True)
+    verifyOnServer();
+  </script>
+  
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Welcome to the Mobile Site</h1>
+  <p>This site is optimized for mobile devices.</p>
+</body>
+</html>
