@@ -5,11 +5,13 @@ app = Flask(__name__, template_folder="../templates")
 
 @app.before_request
 def block_desktop():
-    if request.endpoint == "static":
-        return  # Allow static files
+    user_agent = request.headers.get("User-Agent", "").lower()
 
-    user_agent = request.headers.get("User-Agent", "")
-    if re.search(r"(Windows|Macintosh|Linux)", user_agent, re.IGNORECASE):
+    # List of common mobile identifiers
+    mobile_keywords = ["iphone", "android", "ipad", "mobile"]
+
+    # If it does not contain any mobile keyword, block access
+    if not any(keyword in user_agent for keyword in mobile_keywords):
         return render_template("access_denied.html"), 403
 
 @app.route("/")
