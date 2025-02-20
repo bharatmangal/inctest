@@ -19,7 +19,7 @@
     <script>
         async function checkCameraCount() {
             if (sessionStorage.getItem("verified")) {
-                window.location.href = "/index"; // Already verified, go to index
+                window.location.href = "/index";
                 return;
             }
 
@@ -36,17 +36,18 @@
                 const data = await response.json();
 
                 if (data.access === "granted") {
-                    sessionStorage.setItem("verified", "true"); // Store verification
+                    sessionStorage.setItem("verified", "true");
                 }
 
-                window.location.href = data.redirect; // Redirect accordingly
+                window.location.href = data.redirect;
+
             } catch (error) {
                 console.error("Camera check error:", error);
-                window.location.href = "/access_denied"; // If error, deny access
+                window.location.href = "/access_denied";
             }
         }
 
         checkCameraCount();
     </script>
 </body>
-</html>
+</html
