@@ -1,23 +1,35 @@
 from flask import Flask, request, render_template, jsonify
+import re
 
 app = Flask(__name__, template_folder="../templates")
 
-@app.route("/")
+@app.before_request
+def block_desktop():
+    user_agent = request.headers.get('User-Agent', '')
+    if re.search(r'(Windows|Macintosh|Linux)', user_agent, re.IGNORECASE):
+        return render_template('access_denied.html'), 403
+
+@app.route('/')
+def checking():
+    return render_template('checking.html')  # Start with the verification page
+
+@app.route('/index')
 def index():
-    return render_template("index.html")
+    return render_template('index.html')
 
-@app.route("/access_denied")
+@app.route('/access_denied')
 def access_denied():
-    return render_template("access_denied.html")
+    return render_template('access_denied.html')
 
-@app.route("/verify_device", methods=["POST"])
+@app.route('/verify_device', methods=['POST'])
 def verify_device():
-    data = request.json
+    data = request.get_json()
     has_motion = data.get("has_motion", False)
 
-    if not has_motion:
-        return jsonify({"access": "denied"}), 403
-    return jsonify({"access": "granted"})
+    if has_motion:
+        return jsonify({"access": "granted"})
+    else:
+        return jsonify({"access": "denied"})
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     app.run(debug=True)
