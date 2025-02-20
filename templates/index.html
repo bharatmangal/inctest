@@ -7,7 +7,7 @@
   <script>
     function checkDevice() {
         const userAgent = navigator.userAgent.toLowerCase();
-        const isDesktop = userAgent.includes("windows") || userAgent.includes("macintosh") || userAgent.includes("linux");
+        const isDesktop = userAgent.includes("windows") || userAgent.includes("macintosh");
 
         if (isDesktop) {
             document.body.innerHTML = "<h1>Access Denied</h1>";
