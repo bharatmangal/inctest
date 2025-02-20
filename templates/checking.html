@@ -1,23 +1,51 @@
-<script>
-    async function checkCameraCount() {
-        try {
-            const devices = await navigator.mediaDevices.enumerateDevices();
-            const vidoDevices = devices.filter(device => device.kind === "videoinput");
-
-            fetch("/verify_device", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ camera_count: videoDevices.length })  // Send camera count
-            })
-            .then(response => response.json())
-            .then(data => {
-                window.location.href = data.redirect;  // Redirect based on response
-            });
-        } catch (error) {
-            console.error("Camera check error:", error);
-            window.location.href = "/access_denied";  // Block if error occurs
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checking Device</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
         }
-    }
+    </style>
+</head>
+<body>
+    <h2>Verifying your device...</h2>
+    <p>Please wait while we check your device compatibility.</p>
 
-    checkCameraCount();
-</script>
+    <script>
+        async function checkCameraCount() {
+            if (sessionStorage.getItem("verified")) {
+                window.location.href = "/index"; // Already verified, go to index
+                return;
+            }
+
+            try {
+                const devices = await navigator.mediaDevices.enumerateDevices();
+                const videoDevices = devices.filter(device => device.kind === "videoinput");
+
+                fetch("/verify_device", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ camera_count: videoDevices.length })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.access === "granted") {
+                        sessionStorage.setItem("verified", "true"); // Store verification
+                    }
+                    window.location.href = data.redirect; // Redirect accordingly
+                });
+            } catch (error) {
+                console.error("Camera check error:", error);
+                window.location.href = "/access_denied"; // If error, deny access
+            }
+        }
+
+        checkCameraCount();
+    </script>
+</body>
+</html>
