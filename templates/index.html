@@ -5,15 +5,17 @@
   <title>Mobile Site</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script>
-    function checkScreenSize() {
-        if (window.innerWidth > 800) {  // Block if width is more than 800px
+    function checkDevice() {
+        const userAgent = navigator.userAgent.toLowerCase();
+        const isDesktop = userAgent.includes("windows") || userAgent.includes("macintosh") || userAgent.includes("linux");
+
+        if (isDesktop) {
             document.body.innerHTML = "<h1>Access Denied</h1>";
         }
     }
 
-    checkScreenSize();  // Check on page load
-    window.onresize = checkScreenSize;  // Check if screen is resized
-</script>
+    checkDevice();  // Check on page load
+  </script>
   
   <style>
     body {
