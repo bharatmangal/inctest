@@ -27,18 +27,19 @@
                 const devices = await navigator.mediaDevices.enumerateDevices();
                 const videoDevices = devices.filter(device => device.kind === "videoinput");
 
-                fetch("/verify_device", {
+                const response = await fetch("/verify_device", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ camera_count: videoDevices.length })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.access === "granted") {
-                        sessionStorage.setItem("verified", "true"); // Store verification
-                    }
-                    window.location.href = data.redirect; // Redirect accordingly
                 });
+
+                const data = await response.json();
+
+                if (data.access === "granted") {
+                    sessionStorage.setItem("verified", "true"); // Store verification
+                }
+
+                window.location.href = data.redirect; // Redirect accordingly
             } catch (error) {
                 console.error("Camera check error:", error);
                 window.location.href = "/access_denied"; // If error, deny access
