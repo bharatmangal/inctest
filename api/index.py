@@ -1,7 +1,7 @@
 from flask import Flask, request, render_template
 import re
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder="../templates")
 
 @app.before_request
 def block_desktop():
